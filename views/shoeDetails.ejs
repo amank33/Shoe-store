@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= shoe.title %> - Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="text-center"><%= shoe.title %></h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div id="shoeCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <% shoe.images.forEach((image, index) => { %>
+                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                <img src="/uploads/<%= image %>" class="d-block w-100" alt="<%= shoe.title %>">
+                            </div>
+                        <% }) %>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#shoeCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#shoeCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Brand:</strong> <%= shoe.brand %></p>
+                <p><strong>Price:</strong> $<%= shoe.price %></p>
+                <p><strong>Description:</strong> <%= shoe.description %></p>
+                <p><strong>Sizes:</strong> <%= shoe.sizes?.join(", ") %></p> 
+                <p><strong>Colors:</strong> <%= shoe.colors?.join(", ") %></p>
+                <p><strong>Rating:</strong> <%= shoe.rating %> ⭐</p>
+
+                <!-- Update Shoe Rating -->
+                <form action="/shoes/<%= shoe._id %>/update" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Update Rating:</label>
+                        <select name="ratingDropdown" class="form-select">
+                            <option value="1">⭐</option>
+                            <option value="2">⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                            <option value="4">⭐⭐⭐⭐</option>
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                        </select>
+                    </div>
+                    <!-- <div class="mb-3">
+                        <label class="form-label">Update Rating:</label>
+                        <div class="star-rating">
+                            <% for (let i = 1; i <= shoe.rating; i++) { %>
+                                <input type="checkbox" id="star<%= i %>" name="rating" value="<%= i %>" checked %>>
+                                <label for="star<%= i %>">⭐</label>
+                            <% } %>
+                            <% for (let i = shoe.rating; i < 5; i++) { %>
+                                <input type="checkbox" id="star<%= i %>" name="rating" value="<%= i %>" %>>
+                                <label for="star<%= i %>">☆</label>
+                            <% } %>
+
+                        </div>
+                    </div> -->
+                    <div class="rating mb-3">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                            <span class="star1" data-value="<%= i %>">
+                                <i class="fa <%= shoe.rating >= i ? 'fa-solid fa-star' : 'fa-solid fa-star-o' %>"></i>
+                                 
+                                <!-- <i><%= shoe.rating >= i ? '⭐' : '☆' %></i> -->
+                            </span>
+                        <% } %>
+                    </div>
+                    <button type="submit" class="btn btn-success">Update</button>
+                </form>
+                <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.querySelectorAll('.star1').forEach(star => {
+            //debugger;
+            star.addEventListener('click', async function() {
+                debugger;
+                const rating = this.getAttribute('data-value');
+                const shoeId = "<%= shoe._id %>";
+        
+                const response = await fetch(`/shoes/${shoeId}/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating })
+                });
+        
+                if (response.ok) {
+                    location.reload(); // Refresh to show updated rating
+                }
+            });
+        });
+        </script>
+</body>
+</html>
